@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
+    use HasFactory, Notifiable;
+
     /** Statuses */
     const PENDING = 'PENDING';
     const ACTIVE = 'ACTIVE';
@@ -16,8 +19,6 @@ class User extends Authenticatable
     /** Types */
     const ADMINISTRATOR = 'ADMINISTRATOR';
     const CUSTOMER = 'CUSTOMER';
-
-    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -42,6 +43,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'token',
+        'token_expired_at',
     ];
 
     /**
@@ -74,4 +76,20 @@ class User extends Authenticatable
         self::ADMINISTRATOR,
         self::CUSTOMER,
     ];
+
+    /**
+     * @return mixed
+     */
+    public function getJWTIdentifier(): mixed
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * @return array
+     */
+    public function getJWTCustomClaims(): array
+    {
+        return [];
+    }
 }
