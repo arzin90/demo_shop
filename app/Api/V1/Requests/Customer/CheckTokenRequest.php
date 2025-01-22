@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Api\V1\Requests\User;
+namespace App\Api\V1\Requests\Customer;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\Rule;
 
-class LoginRequest extends FormRequest
+class CheckTokenRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -14,9 +16,10 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
+        RateLimiter::hit(request()->ip(), 60 * config('custom.decay_minutes'));
+
         return [
-            'email' => ['required', 'email'],
-            'password' => ['required', 'min:6']
+            'token' => ['required', Rule::exists('users')]
         ];
     }
 }

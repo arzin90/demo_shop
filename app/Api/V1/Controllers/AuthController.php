@@ -2,7 +2,7 @@
 
 namespace App\Api\V1\Controllers;
 
-use App\Api\V1\Requests\User\LoginRequest;
+use App\Api\V1\Requests\Auth\LoginRequest;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;

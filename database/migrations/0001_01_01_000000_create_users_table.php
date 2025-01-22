@@ -18,8 +18,8 @@ return new class extends Migration {
             $table->enum('status', User::$statuses)->default(User::PENDING);
             $table->enum('type', User::$types)->default(User::CUSTOMER);
             $table->string('email')->unique();
-            $table->string('password');
-            $table->string('token')->nullable();
+            $table->string('password')->nullable();
+            $table->string('token')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('token_expired_at')->nullable();
             $table->timestamps();
