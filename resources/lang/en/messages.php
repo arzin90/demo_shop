@@ -9,7 +9,9 @@ return [
      */
 
     'customer' => [
-        'added' => 'Customer successfully added!'
+        'added' => 'Customer successfully added!',
+        'updated' => 'Customer successfully updated!',
+        'deleted' => 'Customer successfully deleted!',
     ],
     'token' => [
         'valid' => 'The token is valid!',

@@ -3,6 +3,7 @@
 namespace App\Api\V1\Controllers;
 
 use App\Api\V1\Requests\Auth\LoginRequest;
+use App\Api\V1\Resources\UserResource;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +57,7 @@ class AuthController extends BaseApiController
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => $auth->factory()->getTTL(),
-            'user' => $auth->user(),
+            'user' => new UserResource($auth->user()),
         ]);
     }
 }

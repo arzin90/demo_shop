@@ -2,6 +2,7 @@
 
 namespace App\Api\V1\Services;
 
+use App\Api\V1\Resources\CustomerResource;
 use App\Helpers\TokenHelper;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
@@ -13,6 +14,28 @@ class CustomerService
      * @var mixed
      */
     private mixed $customer;
+
+    /**
+     * @param int $id
+     * @return mixed
+     */
+    private function findById(int $id): mixed
+    {
+        return User::customers()->findOrFail($id);
+    }
+
+    /**
+     * @param array|null $search
+     * @return mixed
+     */
+    public function getData(?array $search): mixed
+    {
+        return CustomerResource::collection(User::customers()->search($search['search'] ?? null)
+            ->filterStatus($search['status'] ?? null)
+            ->paginate())
+            ->response()
+            ->getData();
+    }
 
     /**
      * @param array $data
@@ -92,5 +115,33 @@ class CustomerService
             'isValid' => true,
             'message' => __('messages.password.successfullyChanged'),
         ];
+    }
+
+    /**
+     * @param int $id
+     * @return CustomerResource
+     */
+    public function byId(int $id): CustomerResource
+    {
+        return new CustomerResource($this->findById($id));
+    }
+
+    /**
+     * @param array $validated
+     * @param int $id
+     * @return void
+     */
+    public function update(array $validated, int $id): void
+    {
+        $this->findById($id)->update($validated);
+    }
+
+    /**
+     * @param int $id
+     * @return void
+     */
+    public function destroy(int $id): void
+    {
+        $this->findById($id)->delete();
     }
 }

@@ -14,7 +14,7 @@ class BaseApiController extends Controller
      *
      * @return JsonResponse
      */
-    public function sendResponse(array $result, int $code = Response::HTTP_OK): JsonResponse
+    public function sendResponse(mixed $result, int $code = Response::HTTP_OK): JsonResponse
     {
         return response()->json([
             'data' => $result,
@@ -22,9 +22,21 @@ class BaseApiController extends Controller
     }
 
     /**
+     * @param string $message
+     * @param int $code
+     *
+     * @return JsonResponse
+     */
+    public function sendResponseMessage(string $message, int $code = Response::HTTP_OK): JsonResponse
+    {
+        return response()->json(compact('message'), $code);
+    }
+
+    /**
      * @param string $errorMessage
      * @param int $code
      * @param array $data
+     *
      * @return JsonResponse
      */
     public function sendError(string $errorMessage = 'Not found!', int $code = Response::HTTP_NOT_FOUND, array $data = []): JsonResponse

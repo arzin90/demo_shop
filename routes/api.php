@@ -9,16 +9,13 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'v1'], function () {
     Route::post('login', [AuthController::class, 'login']);
 
+    Route::group(['prefix' => 'customers', 'middleware' => [TooManyAttemptsMiddleware::class]], function () {
+        Route::post('verify', [CustomerController::class, 'verify']);
+        Route::post('check-token', [CustomerController::class, 'checkToken']);
+    });
+
     Route::middleware('auth:api')->group(function () {
         Route::delete('refresh-token', [AuthController::class, 'refreshToken']);
-
-        Route::prefix('customers')->group(function () {
-            Route::withoutMiddleware('auth:api')->middleware(TooManyAttemptsMiddleware::class)->group(function () {
-                Route::post('verify', [CustomerController::class, 'verify']);
-                Route::post('check-token', [CustomerController::class, 'checkToken']);
-            });
-
-            Route::resource('/', CustomerController::class)->middleware(AdminAccessMiddleware::class);
-        });
+        Route::apiResource('customers', CustomerController::class)->middleware(AdminAccessMiddleware::class);
     });
 });

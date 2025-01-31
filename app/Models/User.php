@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\CustomTimestampsFormat;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -9,7 +11,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, CustomTimestampsFormat;
 
     /** Statuses */
     const PENDING = 'PENDING';
@@ -48,20 +50,6 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'token_expired_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-
-    /**
      * @var array|string[]
      */
     public static array $statuses = [
@@ -79,6 +67,20 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'custom_datetime:Y-m-d H:i:s',
+            'token_expired_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    /**
      * @return mixed
      */
     public function getJWTIdentifier(): mixed
@@ -92,5 +94,44 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [];
+    }
+
+    /**
+     * @param Builder $builder
+     * @return Builder
+     */
+    public function scopeCustomers(Builder $builder): Builder
+    {
+        return $builder->where('type', self::CUSTOMER);
+    }
+
+    /**
+     * @param Builder $builder
+     * @param string|null $search
+     * @return Builder
+     */
+    public function scopeSearch(Builder $builder, ?string $search): Builder
+    {
+        if ($search) {
+            return $builder->where('first_name', 'like', "%$search%")
+                ->orWhere('last_name', 'like', "%$search%")
+                ->orWhere('email', 'like', "%$search%");
+        }
+
+        return $builder;
+    }
+
+    /**
+     * @param Builder $builder
+     * @param array|null $status
+     * @return Builder
+     */
+    public function scopeFilterStatus(Builder $builder, ?array $status): Builder
+    {
+        if ($status) {
+            return $builder->whereIn('status', $status);
+        }
+
+        return $builder;
     }
 }
